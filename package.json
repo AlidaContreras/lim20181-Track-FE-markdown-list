@@ -21,5 +21,9 @@
   "homepage": "https://github.com/AlidaContreras/lim20181-Track-FE-markdown-list#readme",
   "devDependencies": {
     "jest": "^23.5.0"
+  },
+  "dependencies": {
+    "link-check": "^4.4.4",
+    "markdown-link-extractor": "^1.2.0"
   }
 }
