@@ -8,3 +8,5 @@ mdLinks (direccion).then((res) => {
 });
 
 
+//npm install --save markdown-link-extractor
+//npm install --save link-check
