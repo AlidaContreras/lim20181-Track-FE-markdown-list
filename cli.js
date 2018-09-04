@@ -3,8 +3,8 @@ const mdLinks  = require('./lib/index')
 //Funcion para leer el contenido del documento MD
 const [, , ...direccion] = process.argv
 
-mdLinks (direccion).then((res) => { 
-  console.log(res) 
+mdLinks (direccion).then((res) => {
+  console.log(res)
 });
 
 
