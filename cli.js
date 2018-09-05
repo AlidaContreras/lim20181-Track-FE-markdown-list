@@ -6,12 +6,17 @@ const [, , ...direction] = process.argv
   
 // }
 
-console.log(mdLinks);
+// console.log(mdLinks);
 
-mdLinks(direction[0]).then((res) => {
+mdLinks(direction[0])
+.then((res) => {
   console.log(res)
 
-});
+})
+.catch((err)=>{
+  console.log(err)
+})
+
 
 
 //npm install --save markdown-link-extractor     https://github.com/tcort/markdown-link-extractor
