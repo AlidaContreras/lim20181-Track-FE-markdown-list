@@ -1,23 +1,13 @@
 #!/usr/bin/env node
-const mdLinks  = require('./lib/index')
-//Funcion para leer el contenido del documento MD
+const validateMD  = require('./index')
+
 const [, , ...direction] = process.argv
-// if(typeof direction[0] !== undefined){
-  
-// }
 
-// console.log(mdLinks);
-
-mdLinks(direction[0])
-.then((res) => {
-  console.log(res)
-
-})
-.catch((err)=>{
-  console.log(err)
-})
-
+validateMD(direction)
+  .then(response => console.log(response))
+  .catch(console.error)
 
 
 //npm install --save markdown-link-extractor     https://github.com/tcort/markdown-link-extractor
 //npm install --save link-check
+// este si es https://github.com/tcort/markdown-link-extractor
