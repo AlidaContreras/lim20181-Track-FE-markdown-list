@@ -1,17 +1,15 @@
 #!/usr/bin/env node
-const validateMD  = require('./index')
+const {validateMD, readFile}  = require('./index')
+// const readFile = require('./index')
 
 const [, , ...direction] = process.argv;
 
-validateMD(direction)
-  .then(response => console.log(response))
+validateMD(direction[0])
+  .then(readFile)
+  .then(response=>{
+    console.log(response);
+  })
   .catch(console.error)
-
-
-
-
-
-
 
 
 
