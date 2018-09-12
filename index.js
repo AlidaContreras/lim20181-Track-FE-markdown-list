@@ -4,17 +4,19 @@ const path = require('path');
 const markdownLinkExtractor = require('markdown-link-extractor');
 const linkCheck = require('link-check');
 const getLinks = require('get-md-links');
-
 const obj = [];
-
-
 const validateMD = (direction) => new Promise((resolve, reject) => {
-  path.resolve(direction);
+  const directionResolve = path.resolve(direction);
   if (path.extname(direction) === '.md') {
-    resolve(direction);
+    if (fs.existsSync(directionResolve)) {
+      resolve(direction);
+    }
+    else {
+      reject('El archivo no existe')
+    }
   }
   else {
-    reject('no es un archivo MD')
+    reject('No es un archivo MD')
   }
 })//resuelve la ruta ingresada, pero validada si es MD
 //y entra a la siguiente funcion como doc para que lea el texto del contenido
@@ -28,17 +30,22 @@ const readFile = (doc) => new Promise((resolve, reject) => {
   })
 })//resuelve el texto del documento.md en string y entra como text a la siguiente 
 //funcion para que extraiga los links
-const linksExtractor = (text) => new Promise((resolve, reject) => {
+const linksExtractor = (text, pathname) => new Promise((resolve, reject) => {
   const arrayLinks = markdownLinkExtractor(text);//esto me devuelve un array de links
-  for (let i = 0; i < arrayLinks.length; i++) {
-    let texto = getLinks(text)[i]
-    obj.push({
-      href: texto.href,
-      text: texto.text,
-      file: path.resolve(ruta[0])
-    })
+  if (arrayLinks.length > 0) {
+    for (let i = 0; i < arrayLinks.length; i++) {
+      let texto = getLinks(text)[i]
+      obj.push({
+        href: texto.href,
+        text: texto.text,
+        file: path.resolve(pathname)
+      })
+    }
+    resolve(obj)
   }
-  resolve(obj)
+  else {
+    reject("El archivo no tiene Links")
+  }
 })
 
 
@@ -59,15 +66,7 @@ const linksExtractor = (text) => new Promise((resolve, reject) => {
 //  })
 //  return links;
 // }
-const [, , ...ruta] = process.argv;
-validateMD(ruta[0])
-  .then(readFile)
-  .then(linksExtractor)
-  // .then(validateStatusHttp)
-  .then(response => {
-    console.log(response);
-  })
-  .catch(console.error)
+
 
 
 
