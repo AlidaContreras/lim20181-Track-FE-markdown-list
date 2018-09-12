@@ -2,16 +2,9 @@
 const {validateMD, readFile, linksExtractor,validateStatusHttp}  = require('./index')
 // const readFile = require('./index')
 
-const [, , ...direction] = process.argv;
 
-validateMD(direction[0])
-  .then(readFile)
-  .then(linksExtractor)
-  .then(validateStatusHttp)
-  .then(response=>{
-    console.log(response);
-  })
-  .catch(console.error)
+
+
 
 
 
