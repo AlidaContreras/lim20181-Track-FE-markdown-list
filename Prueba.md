@@ -1,10 +1,5 @@
-
-
-
 Hola, soy un archivo en formato MarkDown
-
-
-* [Array en MDN 0](https://developer.mozilla.org/) //ROTO
+* [Array en MDN 0](https://developer.mozill.org/) //ROTO
 
 * [Array.map en MDN 2](https://developer.mozilla.org/es/docs/Web/JavaScript/Referencia/Objetos_globales/Array/map)
 

@@ -7,7 +7,7 @@ const [, , ...direction] = process.argv;
 validateMD(direction[0])
   .then(readFile)
   .then(linksExtractor)
-  // .then(validateStatusHttp)
+  .then(validateStatusHttp)
   .then(response=>{
     console.log(response);
   })
