@@ -1,10 +1,20 @@
 #!/usr/bin/env node
-const mdLinks  = require('./lib/index')
-//Funcion para leer el contenido del documento MD
-const [, , ...direccion] = process.argv
-
-mdLinks(direccion).then((res) => { 
-  console.log(res) 
-});
+const {validateMD, readFile, linksExtractor,validateStatusHttp}  = require('./index')
+// const readFile = require('./index')
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+//npm install --save markdown-link-extractor     https://github.com/tcort/markdown-link-extractor
+//npm install --save link-check                   https://github.com/tcort/markdown-link-extractor
+//npm install --save get-md-links                 https://www.npmjs.com/package/get-md-links
