@@ -48,53 +48,22 @@ const linksExtractor = (text, pathname) => new Promise((resolve, reject) => {
   }
 })
 
-
-
-// const searchLink = (arrayFiles) => {
-//  const links = [];
-//  arrayFiles.forEach(file => {
-//    const data = fs.readFileSync(file, 'utf8');
-//    const renderer = new marked.Renderer();
-//    renderer.link = (href, title, text) => {
-//      links.push({
-//        href: href,
-//        text: text,
-//        file: file
-//      });
-//    };
-//    marked(data, { renderer });
-//  })
-//  return links;
-// }
-
-
-
-
-
-
-
-
-
-
-
-
-
 //resuelve un array con todos los links que se encontro en el text
-// const validateStatusHttp = (arrayLinks) => new Promise((resolve, reject) => {
-//   arrayLinks.forEach(link => {
-//     linkCheck(link, (err, result) => {
-//       if (err) {
-//         reject(err);
-//       } else {
-//         resolve (`${result.link} is ${result.status}`);
-//       }
-//     })
-//   });
-// })
+const validateStatusHttp = (obj) => new Promise((resolve, reject) => {
+  obj.map(link => {
+    linkCheck(link.href, (err, result) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve (`${result.link} is ${result.status}`);
+      }
+    })
+  });
+})
 
 module.exports = {
   validateMD,
   readFile,
   linksExtractor,
-  // validateStatusHttp,
+  validateStatusHttp,
 }

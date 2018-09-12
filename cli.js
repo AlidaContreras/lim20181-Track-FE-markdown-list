@@ -6,7 +6,7 @@ const [, , ...ruta] = process.argv;
 validateMD(ruta[0])
   .then(readFile)
   .then((text)=>linksExtractor(text,ruta[0]))
-  // .then(validateStatusHttp)
+  .then(validateStatusHttp)
   .then(response => {
     console.log(response);
   })
