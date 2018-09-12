@@ -35,15 +35,11 @@ const linksExtractor = (text) => new Promise((resolve, reject) => {
     obj.push({
       href: texto.href,
       text: texto.text,
-      file:path.resolve(ruta[0])
+      file: path.resolve(ruta[0])
     })
   }
-
-
   resolve(obj)
 })
-
-
 
 
 
@@ -68,7 +64,7 @@ validateMD(ruta[0])
   .then(readFile)
   .then(linksExtractor)
   // .then(validateStatusHttp)
-  .then(response=>{
+  .then(response => {
     console.log(response);
   })
   .catch(console.error)
