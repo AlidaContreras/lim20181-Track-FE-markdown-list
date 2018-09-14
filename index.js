@@ -9,25 +9,10 @@ const obj = [];
 
 
 const validateMD = (direction) => new Promise((resolve, reject) => {
-  const directionResolve = path.resolve(direction);
-  if (path.extname(direction) === '.md') {
-    if (fs.existsSync(directionResolve)) {
-      resolve(direction);
-    }
-    else {
-      reject('El archivo no existe')
-    }
-  }
-  else {
-    recursive(direction)
-      .then(
-        function (files) {
-          resolve("files are", files);
-        },
-        function (error) {
-          reject("something exploded", error);
-        }
-      )
+  const pathAbsolute = path.resolve(direction)
+  let statPath = fs.statSync(pathAbsolute)
+  if(statPath.isFile()){
+    if(pathAbsolute.e)
   }
 })//resuelve la ruta ingresada, pero validada si es MD
 //y entra a la siguiente funcion como doc para que lea el texto del contenido
