@@ -1,16 +1,23 @@
 #!/usr/bin/env node
-const {validateMD, readContent, linksExtractor,validateStatusHttp}  = require('./index')
+const { validateDirect, validateMD, readContent, linksExtractor, validateStatusHttp } = require('./index')
 // const readFile = require('./index')
+const path = require('path');
 
 const [, , ...ruta] = process.argv;
-validateMD(ruta[0])
+
+//const pathAbs = validateDirect(ruta[0]);
+//console.log(path.resolve(ruta[0]))
+console.log(ruta[0])
+console.log(process.cwd())
+console.log(path.join(process.cwd(),'carpetaPrueba'))
+//validateMD(pathAbs);
   // .then(readContent)
   // .then((text)=>linksExtractor(text,ruta[0]))
   // .then(validateStatusHttp)
-  .then(response => {
-    console.log(response);
-  })
-  .catch(console.error)
+  // .then(response => {
+  //   console.log(response);
+  // })
+  // .catch(console.error)
 
 
 

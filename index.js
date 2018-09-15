@@ -8,13 +8,30 @@ var recursive = require("recursive-readdir");
 const obj = [];
 
 
-const validateMD = (direction) => new Promise((resolve, reject) => {
-  const pathAbsolute = path.resolve(direction)
-  let statPath = fs.statSync(pathAbsolute)
-  if(statPath.isFile()){
-    if(pathAbsolute.e)
+const validateDirect = (direction) => {
+     return path.resolve(direction);
+ }
+
+const validateMD = (direction, arrPaths_) => {
+  arrPaths_ = arrPaths_ || [];
+  if (fs.statSync(direction).isFile() && path.extname(direction) === '.md') {
+      arrPaths_.push(direction)
   }
-})//resuelve la ruta ingresada, pero validada si es MD
+  else if (fs.statSync(direction).isDirectory()) {
+    const arrPathDirec = fs.readdirSync(direction);
+    arrPathDirec.forEach(elem => {
+      const newRoute = path.join(direction, elem);
+      validateMD(newRoute);
+    })
+    
+    
+  }
+  console.log(arrPaths_);
+  return arrPaths_
+}
+
+
+//resuelve la ruta ingresada, pero validada si es MD
 //y entra a la siguiente funcion como doc para que lea el texto del contenido
 // const readContent = (doc) => new Promise((resolve, reject) => {
 //   fs.readFile(doc, 'utf8', (err, data) => {
@@ -63,6 +80,7 @@ const validateMD = (direction) => new Promise((resolve, reject) => {
 
 // }
 module.exports = {
+  validateDirect,
   validateMD,
   // readContent,
   // linksExtractor,

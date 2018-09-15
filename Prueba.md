@@ -9,4 +9,38 @@ Hola, soy un archivo en formato MarkDown
 
 * [Array en MDN 4](https://facebook.com/) 
 
+  if (statPath.isFile()) {
+    if (path.extname(pathAbsolute) === '.md') {
+      arrPaths.push(pathAbsolute)
+      // console.log(arrPaths);
+    }
+  }
+  else if (statPath.isDirectory() {
+    const arrPathDirec = fs.readdirSync(pathAbsolute);
+    // console.log(arrPathDirec);
+    arrPathDirec.forEach(direct => {
+      arrPaths = arrPaths.concat(validateMD(direct));
+    })
+  }
+})
+
+//con libreria
+if (path.extname(direction) === '.md') {
+    if (fs.existsSync(directionResolve)) {
+      resolve(direction);
+    }
+    else {
+      reject('El archivo no existe')
+    }
+  }
+  else {
+    
+    recursive(directionResolve, function (err, files) {
+      const elResult = path.join(`${directionResolve}`,`${files}`)
+      // `files` is an array of file paths
+      console.log(files);
+
+    });
+  }
+
 
