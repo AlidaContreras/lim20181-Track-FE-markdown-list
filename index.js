@@ -8,27 +8,28 @@ var recursive = require("recursive-readdir");
 const obj = [];
 
 
-const validateDirect = (direction) => {
-     return path.resolve(direction);
- }
+// const validateDirect = (direction) => {
+  
+//   return path.resolve(direction);
+// }
 
-const validateMD = (direction, arrPaths_) => {
-  arrPaths_ = arrPaths_ || [];
-  if (fs.statSync(direction).isFile() && path.extname(direction) === '.md') {
-      arrPaths_.push(direction)
-  }
-  else if (fs.statSync(direction).isDirectory()) {
-    const arrPathDirec = fs.readdirSync(direction);
-    arrPathDirec.forEach(elem => {
-      const newRoute = path.join(direction, elem);
-      validateMD(newRoute);
-    })
+// const validateMD = (direction, arrPaths_) => {
+//   arrPaths_ = arrPaths_ || [];
+//   if (fs.statSync(direction).isFile() && path.extname(direction) === '.md') {
+//       arrPaths_.push(direction)
+//   }
+//   else if (fs.statSync(direction).isDirectory()) {
+//     const arrPathDirec = fs.readdirSync(direction);
+//     arrPathDirec.forEach(elem => {
+//       const newRoute = path.join(direction, elem);
+//       validateMD(newRoute);
+//     })
     
     
-  }
-  console.log(arrPaths_);
-  return arrPaths_
-}
+//   }
+//   console.log(arrPaths_);
+//   return arrPaths_
+// }
 
 
 //resuelve la ruta ingresada, pero validada si es MD
@@ -80,8 +81,8 @@ const validateMD = (direction, arrPaths_) => {
 
 // }
 module.exports = {
-  validateDirect,
-  validateMD,
+  // validateDirect,
+  // validateMD,
   // readContent,
   // linksExtractor,
   // validateStatusHttp,

@@ -6,10 +6,12 @@ const path = require('path');
 const [, , ...ruta] = process.argv;
 
 //const pathAbs = validateDirect(ruta[0]);
-//console.log(path.resolve(ruta[0]))
-console.log(ruta[0])
-console.log(process.cwd())
-console.log(path.join(process.cwd(),'carpetaPrueba'))
+// console.log(path.resolve(ruta[0]))
+console.log(ruta[0].replace("\\"))
+console.log(ruta[0].split("\\"))
+// console.log(ruta[0])
+// console.log(process.cwd())
+// console.log(path.join(process.cwd(),'carpetaPrueba'))
 //validateMD(pathAbs);
   // .then(readContent)
   // .then((text)=>linksExtractor(text,ruta[0]))
