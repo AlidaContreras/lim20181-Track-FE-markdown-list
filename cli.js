@@ -1,25 +1,23 @@
 #!/usr/bin/env node
-const { validateDirect, validateMD, readContent, linksExtractor, validateStatusHttp } = require('./index')
-// const readFile = require('./index')
+const {mdLinks}  = require('./index')
+const [, , ...ruta] = process.argv;
+console.log(ruta)
+const program = require('commander');
 const path = require('path');
 
-const [, , ...ruta] = process.argv;
+program
+  .version('0.1.0')
+  .arguments('<path>')
+  .option('-v, --validate', 'valida links')
+  .option('-s, --stats', 'contador de links')  
+  .option('-s -v, --stats-validate', 'resumen del stado de links')
+  .parse(process.argv);
 
-//const pathAbs = validateDirect(ruta[0]);
-// console.log(path.resolve(ruta[0]))
-console.log(ruta[0].replace("\\"))
-console.log(ruta[0].split("\\"))
-// console.log(ruta[0])
-// console.log(process.cwd())
-// console.log(path.join(process.cwd(),'carpetaPrueba'))
-//validateMD(pathAbs);
-  // .then(readContent)
-  // .then((text)=>linksExtractor(text,ruta[0]))
-  // .then(validateStatusHttp)
-  // .then(response => {
-  //   console.log(response);
-  // })
-  // .catch(console.error)
+
+/* if(ruta.length === 1){
+  mdLinks(ruta[0])
+} */
+
 
 
 
