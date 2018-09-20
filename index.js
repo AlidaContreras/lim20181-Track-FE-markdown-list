@@ -63,7 +63,6 @@ const validateStatusHttp = (obj) => new Promise((resolve, reject) => {
     return linkCheckPromise(link)
   })
   Promise.all(checks).then(res => {
-    console.log(res)
     resolve(res)
   })
 })
@@ -106,9 +105,6 @@ const mdLinks = (ruta, options) => {
       .catch(console.error)
   }
   else if (options.validate && !options.stats) {
-    // console.log(option1,option2);
-    console.log('ruta  y  -v');
-
     validateMD(ruta)
       .then(readContent)
       .then((text) => linksExtractor(text, ruta))
