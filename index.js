@@ -72,20 +72,28 @@ const linkCheckPromise = (link) => {
     linkCheck(link.href, (err, result) => {
       if (err) {
         link.status = 404
-        link.text = 'Fail'
+        link.value = 'Fail'
         resolve(link)
       } else {
         if (result.statusCode >= 200 && result.statusCode < 300) {
           link.status = result.statusCode
-          link.text = 'OK'
+          link.value = 'OK'
           resolve(link)
         } else {
           link.status = result.statusCode
-          link.text = 'Fail'
+          link.value = 'Fail'
           resolve(link)
         }
       }
     })
+  })
+}
+const stats = (arrayLinks) => {
+  return new Promise ((resolve, reject) => {
+    {
+      total:arrayLinks.length,
+      unique: 
+    }
   })
 }
 
@@ -115,6 +123,15 @@ const mdLinks = (ruta, options) => {
       .catch(console.error)
   }
   else if (!options.validate && options.stats) {
+    validateMD(ruta)
+      .then(readContent)
+      .then((text) => linksExtractor(text, ruta))
+      .then(stats)
+      .then(response => {
+        console.log(response);
+      })
+      .catch(console.error)
+
 
   }
   else if (options.validate && options.stats) {
