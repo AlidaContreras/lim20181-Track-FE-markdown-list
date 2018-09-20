@@ -51,7 +51,7 @@ const linksExtractor = (text, pathname) => new Promise((resolve, reject) => {
         text: texto.text,
       })
     }
-    resolve(obj)
+    resolve([obj, arrayLinks])
   }
   else {
     reject("El archivo no tiene Links")
@@ -59,51 +59,71 @@ const linksExtractor = (text, pathname) => new Promise((resolve, reject) => {
 })
 //resuelve un array con todos los links que se encontro en el text
 const validateStatusHttp = (obj) => new Promise((resolve, reject) => {
-  const checks = []
-  obj.map(link => {
-    checks.push(new Promise((resolve1, reject1) => {
-      linkCheck(link.href, (err, result) => {
-        if (err) {
-          reject1(err);
-        } else {
-          resolve1(`${result.link} is ${result.status}`);
-        }
-      })
-    }))
-  });
-  Promise.all(checks).then(resolve)
+  const checks = obj[0].map(link => {
+    return linkCheckPromise(link)
+  })
+  Promise.all(checks).then(res => {
+    console.log(res)
+    resolve(res)
+  })
 })
 
+const linkCheckPromise = (link) => {
+  return new Promise((resolve, reject) => {
+    linkCheck(link.href, (err, result) => {
+      if (err) {
+        link.status = 404
+        link.text = 'Fail'
+        resolve(link)
+      } else {
+        if (result.statusCode >= 200 && result.statusCode < 300) {
+          link.status = result.statusCode
+          link.text = 'OK'
+          resolve(link)
+        } else {
+          link.status = result.statusCode
+          link.text = 'Fail'
+          resolve(link)
+        }
+      }
+    })
+  })
+}
+
 const mdLinks = (ruta, options) => {
-  console.log(ruta, option1,option2);
-  
   //   return new Promise((resolve,reject)=>{
-  if (!options.validate && !options.stats) {
+  // if (){
+  //   console.log ('Ingrese ruta')
+  // }
+  if (!options.validate && !options.stats) {//solo pone la ruta
     console.log('solo readme');
-    // validateMD(ruta)
-    //   .then(readContent)
-    //   .then((text) => linksExtractor(text, ruta))
-    //   .then(response => {
-    //     console.log(response);
-    //   })
-    //   .catch(console.error)
+    validateMD(ruta)
+      .then(readContent)
+      .then((text) => linksExtractor(text, ruta))
+      .then(response => {
+        console.log(response);
+      })
+      .catch(console.error)
   }
   else if (options.validate && !options.stats) {
     // console.log(option1,option2);
     console.log('ruta  y  -v');
 
-    // validateMD(ruta)
-    //   .then(readContent)
-    //   .then((text) => linksExtractor(text, ruta))
-    //   .then(validateStatusHttp)
-    //   .then(response => {
-    //     console.log(response);
-    //   })
-    //   .catch(console.error)
+    validateMD(ruta)
+      .then(readContent)
+      .then((text) => linksExtractor(text, ruta))
+      .then(validateStatusHttp)
+      .then(response => {
+        console.log(response);
+      })
+      .catch(console.error)
   }
+  else if (!options.validate && options.stats) {
 
+  }
+  else if (options.validate && options.stats) {
 
-
+  }
   //})
 }
 

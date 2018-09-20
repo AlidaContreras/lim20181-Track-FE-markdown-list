@@ -23,7 +23,6 @@
     "jest": "^23.5.0"
   },
   "dependencies": {
-    "commander": "^2.18.0",
     "get-md-links": "^0.1.0",
     "link-check": "^4.4.4",
     "markdown-link-extractor": "^1.2.0",
