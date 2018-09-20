@@ -20,10 +20,10 @@ const validateMD = (direction) => new Promise((resolve, reject) => {
   else {
     recursive(direction)
       .then(
-        function (files) {
+        (files) => {
           resolve("files are", files);
         },
-        function (error) {
+        (error) => {
           reject("something exploded", error);
         }
       )
@@ -74,30 +74,39 @@ const validateStatusHttp = (obj) => new Promise((resolve, reject) => {
   Promise.all(checks).then(resolve)
 })
 
-/* validateMD(ruta[0])
-  .then(readContent)
-  .then((text)=>linksExtractor(text,ruta[0]))
-  .then(validateStatusHttp)
-  .then(response => {
-    console.log(response);
-  })
-  .catch(console.error) */
+const mdLinks = (ruta, options) => {
+  console.log(ruta, option1,option2);
+  
+  //   return new Promise((resolve,reject)=>{
+  if (!options.validate && !options.stats) {
+    console.log('solo readme');
+    // validateMD(ruta)
+    //   .then(readContent)
+    //   .then((text) => linksExtractor(text, ruta))
+    //   .then(response => {
+    //     console.log(response);
+    //   })
+    //   .catch(console.error)
+  }
+  else if (options.validate && !options.stats) {
+    // console.log(option1,option2);
+    console.log('ruta  y  -v');
 
-const mdLinks = (option) => {
-  console.log(option);
-/*   return new Promise((resolve,reject)=>{
-    if(ruta[0] === ""){
-    }
-    else if()
+    // validateMD(ruta)
+    //   .then(readContent)
+    //   .then((text) => linksExtractor(text, ruta))
+    //   .then(validateStatusHttp)
+    //   .then(response => {
+    //     console.log(response);
+    //   })
+    //   .catch(console.error)
+  }
 
 
 
-  }) */
+  //})
 }
+
 module.exports = {
   mdLinks
-  // validateMD,
-  // readContent,
-  // linksExtractor,
-  // validateStatusHttp,
 }

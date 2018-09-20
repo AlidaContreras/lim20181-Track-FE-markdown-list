@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 const {mdLinks}  = require('./index')
-const [, , ...ruta] = process.argv;
-console.log(ruta)
+const [, , ...params] = process.argv;
 const program = require('commander');
 const path = require('path');
 
@@ -9,14 +8,33 @@ program
   .version('0.1.0')
   .arguments('<path>')
   .option('-v, --validate', 'valida links')
-  .option('-s, --stats', 'contador de links')  
-  .option('-s -v, --stats-validate', 'resumen del stado de links')
+  .option('-s, --stats', 'contador de links')
+  .option('-s -v, --stats-validate', 'resumen del estado de links')
   .parse(process.argv);
 
 
-/* if(ruta.length === 1){
-  mdLinks(ruta[0])
-} */
+const options = {
+  validate: false,
+  stats: false,
+};
+
+// FIXME: chequear q params tenga por lo menos length == 1
+
+const [ruta, ...opts] = params
+
+opts.forEach((o) => {
+  if (o === '-v' || o === '--validate') {
+    options.validate = true;
+  }
+  if (o === '-s' || o === '--stats') {
+    options.stats = true;
+  }
+})
+
+console.log(ruta, options)
+
+// mdLinks(ruta, options);
+
 
 
 
