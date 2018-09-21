@@ -9,7 +9,8 @@ const obj = [];
 
 const validateMD = (direction) => new Promise((resolve, reject) => {
   const directionResolve = path.resolve(direction);
-  // if (direction.isFile) {
+  const directory = fs.statSync(directionResolve);
+  if (directory.isFile()) {
     if (path.extname(direction) === '.md') {
       if (fs.existsSync(directionResolve)) {
         resolve(direction);
@@ -18,18 +19,21 @@ const validateMD = (direction) => new Promise((resolve, reject) => {
         reject('El archivo no existe')
       }
     }
-  // }
-  else if (directionResolve.isDirectory) {
-    resolve(directionResolve);
-
-    // recursive(directionResolve)
-    //   .then((files) => {
-    //       resolve(files);
-    //     },
-    //     (error) => {
-    //       reject("something exploded", error);
-    //     }
-
+  }
+  else if (directory.isDirectory()) {
+    if(Array.isArray(directory)){
+      resolve("directory es array")
+    }
+    else{
+       recursive(direction).then(
+      (files) => {
+        console.log(files);
+      },
+      (error) => {
+        console.error("something exploded", error);
+      }
+    );
+    }
   }
 })//resuelve la ruta ingresada, pero validada si es MD
 //y entra a la siguiente funcion como doc para que lea el texto del contenido
@@ -44,7 +48,6 @@ const readContent = (doc) => new Promise((resolve, reject) => {
 })//resuelve el texto del documento.md en string y entra como text a la siguiente 
 //funcion para que extraiga los links
 const readDir = (arrPath) => new Promise((resolve, reject) => {
-  resolve(arrPath);
 
 })
 const linksExtractor = (text, pathname) => new Promise((resolve, reject) => {
@@ -132,7 +135,7 @@ const mdLinks = (ruta, options) => {
       .then(readDir)
       .then(response => {
         console.log(response);
-      })
+        })
       .catch(console.error)
 
   }
