@@ -1,6 +1,6 @@
-* [Array en MDN 3](https://goosadfasfsdafsafdasfagl.com/)
+* [Array en MDN 1](https://goosadfasfsdafsafdasfagl.com/)
 
-* [Array en MDN 4](https://facebook.com/) 
+* [Array en MDN 2](https://facebook.com/) 
 
 <!-- const validateMD = (direction, arrPaths_) => {
   arrPaths_ = arrPaths_ || [];

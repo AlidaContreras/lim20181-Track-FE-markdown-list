@@ -9,24 +9,27 @@ const obj = [];
 
 const validateMD = (direction) => new Promise((resolve, reject) => {
   const directionResolve = path.resolve(direction);
-  if (path.extname(direction) === '.md') {
-    if (fs.existsSync(directionResolve)) {
-      resolve(direction);
+  // if (direction.isFile) {
+    if (path.extname(direction) === '.md') {
+      if (fs.existsSync(directionResolve)) {
+        resolve(direction);
+      }
+      else {
+        reject('El archivo no existe')
+      }
     }
-    else {
-      reject('El archivo no existe')
-    }
-  }
-  else {
-    recursive(direction)
-      .then(
-        (files) => {
-          resolve("files are", files);
-        },
-        (error) => {
-          reject("something exploded", error);
-        }
-      )
+  // }
+  else if (directionResolve.isDirectory) {
+    resolve(directionResolve);
+
+    // recursive(directionResolve)
+    //   .then((files) => {
+    //       resolve(files);
+    //     },
+    //     (error) => {
+    //       reject("something exploded", error);
+    //     }
+
   }
 })//resuelve la ruta ingresada, pero validada si es MD
 //y entra a la siguiente funcion como doc para que lea el texto del contenido
@@ -40,6 +43,10 @@ const readContent = (doc) => new Promise((resolve, reject) => {
   })
 })//resuelve el texto del documento.md en string y entra como text a la siguiente 
 //funcion para que extraiga los links
+const readDir = (arrPath) => new Promise((resolve, reject) => {
+  resolve(arrPath);
+
+})
 const linksExtractor = (text, pathname) => new Promise((resolve, reject) => {
   const arrayLinks = markdownLinkExtractor(text);//esto me devuelve un array de links
   if (arrayLinks.length > 0) {
@@ -89,37 +96,52 @@ const linkCheckPromise = (link) => {
   })
 }
 const stats = (arrayLinks) => {
-  return new Promise ((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     const obj1 = {
-      total:arrayLinks.length,
+      total: arrayLinks.length,
       unique: [...new Set(arrayLinks)].length,
     }
     resolve(obj1)
   })
 }
 const validateStats = (arrWithStatus) => {
-  return new Promise ((result,reject) =>{
-    const arrNew = arrWithStatus[1].foreach(obj => {
-       const cont = 0;
-      if(obj.value === 'Fail'){
-        cont++;
+  return new Promise((result, reject) => {
+    const arrBroken = [];
+    const arrUniques = [];
+    arrWithStatus.forEach(element => {
+      arrUniques.push(element.href)
+      if (element.value === 'Fail') {
+        arrBroken.push(element.href)
       }
-    })
-    result (cont);
+    });
+    const obj2 = {
+      total: arrWithStatus.length,
+      unique: [...new Set(arrUniques)].length,
+      broken: arrBroken.length
+    }
+    result(obj2);
   })
 }
-
 const mdLinks = (ruta, options) => {
   //   return new Promise((resolve,reject)=>{
   // if (){
   //   console.log ('Ingrese ruta')
   // }
-  if (!options.validate && !options.stats) {//solo pone la ruta
+  if (ruta.isDirectory && !options.validate && !options.stats) {
+    validateMD(ruta)
+      .then(readDir)
+      .then(response => {
+        console.log(response);
+      })
+      .catch(console.error)
+
+  }
+  else if (!options.validate && !options.stats) {//solo pone la ruta
     validateMD(ruta)
       .then(readContent)
       .then((text) => linksExtractor(text, ruta))
       .then(response => {
-        console.log(response);
+        console.log(response[0]);
       })
       .catch(console.error)
   }
@@ -145,22 +167,19 @@ const mdLinks = (ruta, options) => {
   }
   else if (options.validate && options.stats) {
     validateMD(ruta)
-    .then(readContent)
-    .then((text) => linksExtractor(text, ruta))
-    .then(validateStats)
-    .then(response => {
-      console.log(response);
-    })
-    .catch(console.error)
-
+      .then(readContent)
+      .then((text) => linksExtractor(text, ruta))
+      .then(validateStatusHttp)
+      .then(validateStats)
+      .then(response => {
+        console.log(response);
+      })
+      .catch(console.error)
   }
-  //})
 }
+//})
+
 
 module.exports = {
   mdLinks
-}
-
-function newFunction() {
-  return 0;
 }
