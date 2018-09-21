@@ -90,10 +90,22 @@ const linkCheckPromise = (link) => {
 }
 const stats = (arrayLinks) => {
   return new Promise ((resolve, reject) => {
-    {
+    const obj1 = {
       total:arrayLinks.length,
-      unique: 
+      unique: [...new Set(arrayLinks)].length,
     }
+    resolve(obj1)
+  })
+}
+const validateStats = (arrWithStatus) => {
+  return new Promise ((result,reject) =>{
+    const arrNew = arrWithStatus[1].foreach(obj => {
+       const cont = 0;
+      if(obj.value === 'Fail'){
+        cont++;
+      }
+    })
+    result (cont);
   })
 }
 
@@ -103,7 +115,6 @@ const mdLinks = (ruta, options) => {
   //   console.log ('Ingrese ruta')
   // }
   if (!options.validate && !options.stats) {//solo pone la ruta
-    console.log('solo readme');
     validateMD(ruta)
       .then(readContent)
       .then((text) => linksExtractor(text, ruta))
@@ -131,10 +142,16 @@ const mdLinks = (ruta, options) => {
         console.log(response);
       })
       .catch(console.error)
-
-
   }
   else if (options.validate && options.stats) {
+    validateMD(ruta)
+    .then(readContent)
+    .then((text) => linksExtractor(text, ruta))
+    .then(validateStats)
+    .then(response => {
+      console.log(response);
+    })
+    .catch(console.error)
 
   }
   //})
@@ -142,4 +159,8 @@ const mdLinks = (ruta, options) => {
 
 module.exports = {
   mdLinks
+}
+
+function newFunction() {
+  return 0;
 }
