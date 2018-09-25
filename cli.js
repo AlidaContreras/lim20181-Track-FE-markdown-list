@@ -18,8 +18,7 @@ opts.forEach((option) => {
 
 // console.log(ruta, options)
 
-mdLinks(ruta, options)
-
+mdLinks(ruta, options);
 
 
 

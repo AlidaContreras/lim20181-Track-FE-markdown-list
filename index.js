@@ -120,18 +120,19 @@ const validateStats = (arrWithStatus) => {
 const mdLinks = (ruta, options) => {
   const path = fs.statSync(ruta);
   return new Promise((resolve, reject) => {
-
     if (path.isDirectory()) {
       validateMD(ruta)
         .then(res => Promise.all(res))
-        .then(paths =>{ return paths.map(path => {
-          readContent(path)
-            .then((text) => linksExtractor(text, ruta))
-            .then(response1 => {
-              console.log(response1[0]);
-            })
-            .catch(console.error)
-        })})
+        .then(paths => {
+          return paths.map(path => {
+            readContent(path)
+              .then((text) => linksExtractor(text, ruta))
+              .then(response1 => {
+                console.log(response1[0]);
+              })
+              .catch(console.error)
+          })
+        })
     }
     else if (!options.validate && !options.stats) {//solo pone la ruta
       validateMD(ruta)
@@ -175,8 +176,6 @@ const mdLinks = (ruta, options) => {
     }
   })
 }
-
-
 module.exports = {
   mdLinks
 }
