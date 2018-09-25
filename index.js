@@ -4,16 +4,16 @@ const path = require('path');
 const markdownLinkExtractor = require('markdown-link-extractor');
 const linkCheck = require('link-check');
 const getLinks = require('get-md-links');
-var recursive = require("recursive-readdir");
 const obj = [];
 
 const validateMD = (direction) => new Promise((resolve, reject) => {
   const directionResolve = path.resolve(direction);
+
   const directory = fs.statSync(directionResolve);
   if (directory.isFile()) {
     if (path.extname(direction) === '.md') {
       if (fs.existsSync(directionResolve)) {
-        resolve(direction);
+        resolve(directionResolve);
       }
       else {
         reject('El archivo no existe')
@@ -21,19 +21,12 @@ const validateMD = (direction) => new Promise((resolve, reject) => {
     }
   }
   else if (directory.isDirectory()) {
-    if(Array.isArray(directory)){
-      resolve("directory es array")
-    }
-    else{
-       recursive(direction).then(
-      (files) => {
-        console.log(files);
-      },
-      (error) => {
-        console.error("something exploded", error);
-      }
-    );
-    }
+    const files = fs.readdirSync(direction);
+    const arrPromesas = files.map((file) => {
+      const abc = path.join(directionResolve, file);
+      return validateMD(abc);
+    })
+    resolve(arrPromesas)
   }
 })//resuelve la ruta ingresada, pero validada si es MD
 //y entra a la siguiente funcion como doc para que lea el texto del contenido
@@ -47,9 +40,6 @@ const readContent = (doc) => new Promise((resolve, reject) => {
   })
 })//resuelve el texto del documento.md en string y entra como text a la siguiente 
 //funcion para que extraiga los links
-const readDir = (arrPath) => new Promise((resolve, reject) => {
-
-})
 const linksExtractor = (text, pathname) => new Promise((resolve, reject) => {
   const arrayLinks = markdownLinkExtractor(text);//esto me devuelve un array de links
   if (arrayLinks.length > 0) {
@@ -125,62 +115,66 @@ const validateStats = (arrWithStatus) => {
     result(obj2);
   })
 }
-const mdLinks = (ruta, options) => {
-  //   return new Promise((resolve,reject)=>{
-  // if (){
-  //   console.log ('Ingrese ruta')
-  // }
-  if (ruta.isDirectory && !options.validate && !options.stats) {
-    validateMD(ruta)
-      .then(readDir)
-      .then(response => {
-        console.log(response);
-        })
-      .catch(console.error)
+// const dir = (w)
 
-  }
-  else if (!options.validate && !options.stats) {//solo pone la ruta
-    validateMD(ruta)
-      .then(readContent)
-      .then((text) => linksExtractor(text, ruta))
-      .then(response => {
-        console.log(response[0]);
-      })
-      .catch(console.error)
-  }
-  else if (options.validate && !options.stats) {
-    validateMD(ruta)
-      .then(readContent)
-      .then((text) => linksExtractor(text, ruta))
-      .then(validateStatusHttp)
-      .then(response => {
-        console.log(response);
-      })
-      .catch(console.error)
-  }
-  else if (!options.validate && options.stats) {
-    validateMD(ruta)
-      .then(readContent)
-      .then((text) => linksExtractor(text, ruta))
-      .then(stats)
-      .then(response => {
-        console.log(response);
-      })
-      .catch(console.error)
-  }
-  else if (options.validate && options.stats) {
-    validateMD(ruta)
-      .then(readContent)
-      .then((text) => linksExtractor(text, ruta))
-      .then(validateStatusHttp)
-      .then(validateStats)
-      .then(response => {
-        console.log(response);
-      })
-      .catch(console.error)
-  }
+const mdLinks = (ruta, options) => {
+  const path = fs.statSync(ruta);
+  return new Promise((resolve, reject) => {
+
+    if (path.isDirectory()) {
+      validateMD(ruta)
+        .then(res => Promise.all(res))
+        .then(paths =>{ return paths.map(path => {
+          readContent(path)
+            .then((text) => linksExtractor(text, ruta))
+            .then(response1 => {
+              console.log(response1[0]);
+            })
+            .catch(console.error)
+        })})
+    }
+    else if (!options.validate && !options.stats) {//solo pone la ruta
+      validateMD(ruta)
+        .then((res) => readContent(res))
+        .then((text) => linksExtractor(text, ruta))
+        .then(response => {
+          console.log(response[0]);
+        })
+        .catch(console.error)
+    }
+    else if (options.validate && !options.stats) {
+      validateMD(ruta)
+        .then((res) => readContent(res))
+        .then((text) => linksExtractor(text, ruta))
+        .then(validateStatusHttp)
+        .then(response => {
+          console.log(response);
+        })
+        .catch(console.error)
+    }
+    else if (!options.validate && options.stats) {
+      validateMD(ruta)
+        .then((res) => readContent(res))
+        .then((text) => linksExtractor(text, ruta))
+        .then(stats)
+        .then(response => {
+          console.log(response);
+        })
+        .catch(console.error)
+    }
+    else if (options.validate && options.stats) {
+      validateMD(ruta)
+        .then((res) => readContent(res))
+        .then((text) => linksExtractor(text, ruta))
+        .then(validateStatusHttp)
+        .then(validateStats)
+        .then(response => {
+          console.log(response)
+        })
+        .catch(console.error)
+    }
+  })
 }
-//})
 
 
 module.exports = {

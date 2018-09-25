@@ -6,9 +6,6 @@ const options = {
   validate: false,
   stats: false,
 };
-
-// FIXME: chequear q params tenga por lo menos length == 1
-
 const [ruta, ...opts] = params
 opts.forEach((option) => {
   if (option === '-v' || option === '--validate') {
@@ -21,7 +18,9 @@ opts.forEach((option) => {
 
 // console.log(ruta, options)
 
-mdLinks(ruta, options);
+mdLinks(ruta, options)
+
+
 
 
 

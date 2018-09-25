@@ -25,7 +25,6 @@
   "dependencies": {
     "get-md-links": "^0.1.0",
     "link-check": "^4.4.4",
-    "markdown-link-extractor": "^1.2.0",
-    "recursive-readdir": "^2.2.2"
+    "markdown-link-extractor": "^1.2.0"
   }
 }
