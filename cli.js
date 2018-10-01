@@ -6,17 +6,17 @@ const options = {
   validate: false,
   stats: false,
 };
-const [ruta, ...opts] = params
+const [ruta, ...opts] = params;
 opts.forEach((option) => {
-  if (option === '-v' || option === '--validate') {
+  if (option === '--v' || option === '--validate') {
     options.validate = true;
   }
-  if (option === '-s' || option === '--stats') {
+  if (option === '--s' || option === '--stats') {
     options.stats = true;
   }
 })
 
-// console.log(ruta, options)
+console.log(ruta, options)
 
 mdLinks(ruta, options);
 

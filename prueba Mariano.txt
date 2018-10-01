@@ -1,0 +1,21 @@
+const funcs = (...params) => ({
+  leerArchivo: () => {
+    const result = 2 + 6
+    return funcs(result)
+  },
+  extraerLinks: () => {
+    // ....
+    console.log(params)
+  },
+  guardarLinks: () => {
+    // ....
+    return funcs
+  },
+  mostrarAlUsuario: () => {
+    // ....
+    return funcs
+  },
+})
+
+
+funcs().leerArchivo().extraerLinks()
