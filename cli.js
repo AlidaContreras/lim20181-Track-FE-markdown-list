@@ -15,10 +15,12 @@ opts.forEach((option) => {
     options.stats = true;
   }
 })
-
-console.log(ruta, options)
-
 mdLinks(ruta, options);
+.then(response1 => {
+  response1.forEach(element => {
+    console.log(`${element.file} ${element.href}  ${element.text} `);
+  });
+})
 
 
 

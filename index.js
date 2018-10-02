@@ -79,83 +79,74 @@ const linkCheckPromise = (link) => {
     })
   })
 }
-// const stats = (arrayLinks) => {
-//   return new Promise((resolve, reject) => {
-//     const obj1 = {
-//       total: arrayLinks.length,
-//       unique: 
-//     }
-//     resolve(obj1)
-//   })
-// }
-const validateStats = (arrWithStatus) => {
+const stats = (arrayOfFil) => {
   return new Promise((result, reject) => {
-    const arrBroken = [];
-    const arrUniques = [];
-    arrWithStatus.forEach(element => {
-      arrUniques.push(element.href)
-      if (element.value === 'Fail') {
-        arrBroken.push(element.href)
-      }
+    const stats1 = {};
+    const arrStats = [];
+    arrayOfFil.map((obj) => {
+      arrStats.push(obj.href);
     });
-    const obj2 = {
-      total: arrWithStatus.length,
-      unique: [...new Set(arrUniques)].length,
-      broken: arrBroken.length
-    }
-    result(obj2);
+    stats1.total = arrStats.length,
+    stats1.unique = [...new Set(arrStats)].length
+    result([stats1, arrayOfFil])
   })
 }
+const validateStats = (arrStatsAndvalidate) => {
+  return new Promise((result, reject) => {
+    const arrBroken = [];
+    arrStatsAndvalidate[1].map((objt) => {
+      if(objt.status === 0){
+        arrBroken.push(objt.href)
+      }
+    })
+    arrStatsAndvalidate[0].broken = arrBroken.length;
 
-
+    result(arrStatsAndvalidate[0])
+  })
+}
 const mdLinks = (ruta, options) => {
   const path = fs.statSync(ruta);
   const arrayOfFile = validateMD(ruta)
   return new Promise((resolve, reject) => {
     if (!options.validate && !options.stats) {//solo pone la ruta
       resolve(linksExtractor(arrayOfFile)
-      .then(response1 => {
-        console.log(response1);
-      })
-      .catch(console.error))
+        .then(response1 => {
+          response1.forEach(element => {
+            console.log(`${element.file} ${element.href}  ${element.text} `);
+          });
+        })
+        .catch(console.error))
     }
     else if (options.validate && !options.stats) {
       resolve(linksExtractor(arrayOfFile)
-          .then((obj) => validateStatusHttp(obj))
-          .then(response => {
-            console.log(response);
-          })
-          .catch(console.error)
-       )
+        .then((obj) => validateStatusHttp(obj))
+        .then(response => {
+          console.log(response);
+        })
+        .catch(console.error)
+      )
     }
     else if (!options.validate && options.stats) {
-      const stats1 = {};
-      const arrStats = [];
       resolve(linksExtractor(arrayOfFile)
-          .then((obj) => validateStatusHttp(obj))
-          .then((obj1) => {
-            obj1.map((obj) => {
-              arrStats.push(obj.href);
-            })
-          }),
-          stats1.total = arrStats.length,
-          stats1.unique = [...new Set(arrStats)].length,
-          console.log(stats1))
-          
-
+      .then((obj) => validateStatusHttp(obj))
+      .then((arrayOfFil) => stats(arrayOfFil))
+      .then(response => {
+        console.log(response[0]);
+      })
+      .catch(console.error)
+      )
     }
-    // else if (options.validate && options.stats) {
-    //   return arrPaths_.map(path => {
-    //     readContent(path)
-    //       .then((text) => linksExtractor(text, ruta))
-    //       .then(validateStatusHttp)
-    //       .then(validateStats)
-    //       .then(response => {
-    //         console.log(response)
-    //       })
-    //       .catch(console.error)
-    //   })
-    // }
+    else if (options.validate && options.stats) {
+      resolve(linksExtractor(arrayOfFile)
+      .then((obj) => validateStatusHttp(obj))
+      .then((arrayOfFil) => stats(arrayOfFil))
+      .then((arrStatsAndvalidate) => validateStats(arrStatsAndvalidate))
+      .then(response => {
+        console.log(response);
+      })
+      .catch(console.error)
+      )
+    }
   })
 }
 module.exports = {
