@@ -87,7 +87,7 @@ const stats = (arrayOfFil) => {
       arrStats.push(obj.href);
     });
     stats1.total = arrStats.length,
-    stats1.unique = [...new Set(arrStats)].length
+      stats1.unique = [...new Set(arrStats)].length
     result([stats1, arrayOfFil])
   })
 }
@@ -95,7 +95,7 @@ const validateStats = (arrStatsAndvalidate) => {
   return new Promise((result, reject) => {
     const arrBroken = [];
     arrStatsAndvalidate[1].map((objt) => {
-      if(objt.status === 0){
+      if (objt.status === 0) {
         arrBroken.push(objt.href)
       }
     })
@@ -109,46 +109,31 @@ const mdLinks = (ruta, options) => {
   const arrayOfFile = validateMD(ruta)
   return new Promise((resolve, reject) => {
     if (!options.validate && !options.stats) {//solo pone la ruta
-      resolve(linksExtractor(arrayOfFile)
-        .then(response1 => {
-          response1.forEach(element => {
-            console.log(`${element.file} ${element.href}  ${element.text} `);
-          });
-        })
-        .catch(console.error))
+      linksExtractor(arrayOfFile)
+        .then(response1 => resolve(response1))
+        .catch(console.error)
     }
     else if (options.validate && !options.stats) {
-      resolve(linksExtractor(arrayOfFile)
+      linksExtractor(arrayOfFile)
         .then((obj) => validateStatusHttp(obj))
-        .then(response => {
-          console.log(response);
-        })
+        .then(response => resolve(response))
         .catch(console.error)
-      )
     }
     else if (!options.validate && options.stats) {
-      resolve(linksExtractor(arrayOfFile)
-      .then((obj) => validateStatusHttp(obj))
-      .then((arrayOfFil) => stats(arrayOfFil))
-      .then(response => {
-        console.log(response[0]);
-      })
-      .catch(console.error)
-      )
+      linksExtractor(arrayOfFile)
+        .then((obj) => validateStatusHttp(obj))
+        .then((arrayOfFil) => stats(arrayOfFil))
+        .then(response => resolve(response[0]))
+        .catch(console.error)
     }
     else if (options.validate && options.stats) {
-      resolve(linksExtractor(arrayOfFile)
-      .then((obj) => validateStatusHttp(obj))
-      .then((arrayOfFil) => stats(arrayOfFil))
-      .then((arrStatsAndvalidate) => validateStats(arrStatsAndvalidate))
-      .then(response => {
-        console.log(response);
-      })
-      .catch(console.error)
-      )
+      linksExtractor(arrayOfFile)
+        .then((obj) => validateStatusHttp(obj))
+        .then((arrayOfFil) => stats(arrayOfFil))
+        .then((arrStatsAndvalidate) => validateStats(arrStatsAndvalidate))
+        .then(response =>resolve(response))
+        .catch(console.error)
     }
   })
 }
-module.exports = {
-  mdLinks
-}
+module.exports = mdLinks;
