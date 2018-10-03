@@ -1,101 +1,139 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const markdownLinkExtractor = require('markdown-link-extractor');
 const linkCheck = require('link-check');
-const getLinks = require('get-md-links');
 
-const obj = [];
+const validateMD = (direction, arrPaths_) => {
+  arrPaths_ = arrPaths_ || [];
+  const directionResolve = path.resolve(direction);
+  const directory = fs.statSync(directionResolve);
+  if (directory.isFile()) {
+    if (path.extname(direction) === '.md') {
+      if (fs.existsSync(directionResolve)) {
+        arrPaths_.push(direction);
 
-
-const validateMD = (direction) => new Promise((resolve, reject) => {
-  path.resolve(direction);
-  if (path.extname(direction) === '.md') {
-    resolve(direction);
-  }
-  else {
-    reject('no es un archivo MD')
-  }
-})//resuelve la ruta ingresada, pero validada si es MD
-//y entra a la siguiente funcion como doc para que lea el texto del contenido
-const readFile = (doc) => new Promise((resolve, reject) => {
-  fs.readFile(doc, 'utf8', (err, data) => {
-    if (err) {
-      reject(err);
-    } else {
-      resolve(data);
+      }
     }
-  })
-})//resuelve el texto del documento.md en string y entra como text a la siguiente 
-//funcion para que extraiga los links
-const linksExtractor = (text) => new Promise((resolve, reject) => {
-  const arrayLinks = markdownLinkExtractor(text);//esto me devuelve un array de links
-  for (let i = 0; i < arrayLinks.length; i++) {
-    let texto = getLinks(text)[i]
-    obj.push({
-      href: texto.href,
-      text: texto.text,
-      file: path.resolve(ruta[0])
+  }
+  else if (directory.isDirectory()) {
+    const filesInDir = fs.readdirSync(direction);
+    filesInDir.map((file) => {
+      const fileResolve = path.join(directionResolve, file);
+      validateMD(fileResolve, arrPaths_);
     })
   }
+  return arrPaths_;
+}//resuelve la ruta ingresada, pero validada si es MD
+//y entra a la siguiente funcion como doc para que lea el texto del contenido
+//resuelve el texto del documento.md en string y entra como text a la siguiente 
+//funcion para que extraiga los links
+const linksExtractor = (arrPathsMd) => new Promise((resolve, reject) => {
+  const obj = [];
+  arrPathsMd.map((pathMD) => {
+    const expRegLinks = /\[((.+?))\]\((http|https|ftp|ftps).+?\)/g;
+    const expRegURLHref = /\((http|https|ftp|ftps).+?\)/g;
+    const expRegLinktext = /\[.+?\]/g;
+    const textarrPathsMd = fs.readFileSync(pathMD).toString();
+    const links = textarrPathsMd.match(expRegLinks);
+    links.map(link => {
+      const textHref = link.match(expRegURLHref).toString();
+      const textText = link.match(expRegLinktext).toString();
+      obj.push({
+        file: path.resolve(pathMD),
+        href: textHref.substring(1, textHref.length - 1),
+        text: textText.substring(1, textText.length - 1),
+      })
+    })
+  })
+
   resolve(obj)
 })
-
-
-
-// const searchLink = (arrayFiles) => {
-//  const links = [];
-//  arrayFiles.forEach(file => {
-//    const data = fs.readFileSync(file, 'utf8');
-//    const renderer = new marked.Renderer();
-//    renderer.link = (href, title, text) => {
-//      links.push({
-//        href: href,
-//        text: text,
-//        file: file
-//      });
-//    };
-//    marked(data, { renderer });
-//  })
-//  return links;
-// }
-const [, , ...ruta] = process.argv;
-validateMD(ruta[0])
-  .then(readFile)
-  .then(linksExtractor)
-  // .then(validateStatusHttp)
-  .then(response => {
-    console.log(response);
-  })
-  .catch(console.error)
-
-
-
-
-
-
-
-
-
-
-
-
 //resuelve un array con todos los links que se encontro en el text
-// const validateStatusHttp = (arrayLinks) => new Promise((resolve, reject) => {
-//   arrayLinks.forEach(link => {
-//     linkCheck(link, (err, result) => {
-//       if (err) {
-//         reject(err);
-//       } else {
-//         resolve (`${result.link} is ${result.status}`);
-//       }
-//     })
-//   });
-// })
+const validateStatusHttp = (obj) => new Promise((resolve, reject) => {
+  const checks = obj.map(link => {
+    return linkCheckPromise(link)
+  })
+  Promise.all(checks).then(res => {
+    resolve(res)
+  })
+})
 
-module.exports = {
-  validateMD,
-  readFile,
-  linksExtractor,
-  // validateStatusHttp,
+const linkCheckPromise = (link) => {
+  return new Promise((resolve, reject) => {
+    linkCheck(link.href, (err, result) => {
+      if (err) {
+        link.status = 404
+        link.value = 'Fail'
+        resolve(link)
+      } else {
+        if (result.statusCode >= 200 && result.statusCode < 300) {
+          link.status = result.statusCode
+          link.value = 'OK'
+          resolve(link)
+        } else {
+          link.status = result.statusCode
+          link.value = 'Fail'
+          resolve(link)
+        }
+      }
+    })
+  })
 }
+const stats = (arrayOfFil) => {
+  return new Promise((result, reject) => {
+    const stats1 = {};
+    const arrStats = [];
+    arrayOfFil.map((obj) => {
+      arrStats.push(obj.href);
+    });
+    stats1.total = arrStats.length,
+      stats1.unique = [...new Set(arrStats)].length
+    result([stats1, arrayOfFil])
+  })
+}
+const validateStats = (arrStatsAndvalidate) => {
+  return new Promise((result, reject) => {
+    const arrBroken = [];
+    arrStatsAndvalidate[1].map((objt) => {
+      if (objt.status === 0) {
+        arrBroken.push(objt.href)
+      }
+    })
+    arrStatsAndvalidate[0].broken = arrBroken.length;
+
+    result(arrStatsAndvalidate[0])
+  })
+}
+const mdLinks = (ruta, options) => {
+  const path = fs.statSync(ruta);
+  const arrayOfFile = validateMD(ruta)
+  return new Promise((resolve, reject) => {
+    if (!options.validate && !options.stats) {//solo pone la ruta
+      linksExtractor(arrayOfFile)
+        .then(response1 => resolve(response1))
+        .catch(console.error)
+    }
+    else if (options.validate && !options.stats) {
+      linksExtractor(arrayOfFile)
+        .then((obj) => validateStatusHttp(obj))
+        .then(response => resolve(response))
+        .catch(console.error)
+    }
+    else if (!options.validate && options.stats) {
+      linksExtractor(arrayOfFile)
+        .then((obj) => validateStatusHttp(obj))
+        .then((arrayOfFil) => stats(arrayOfFil))
+        .then(response => resolve(response[0]))
+        .catch(console.error)
+    }
+    else if (options.validate && options.stats) {
+      linksExtractor(arrayOfFile)
+        .then((obj) => validateStatusHttp(obj))
+        .then((arrayOfFil) => stats(arrayOfFil))
+        .then((arrStatsAndvalidate) => validateStats(arrStatsAndvalidate))
+        .then(response =>resolve(response))
+        .catch(console.error)
+    }
+  })
+}
+module.exports = mdLinks;

@@ -1,5 +1,5 @@
 {
-  "name": "lim20181-track-fe-markdown-list",
+  "name": "alidacontreras-mdlinks",
   "version": "1.0.0",
   "description": "[Markdown](https://es.wikipedia.org/wiki/Markdown) es un lenguaje de marcado\r ligero muy popular entre developers. Es usado en muchísimas plataformas que\r manejan texto plano (GitHub, foros, blogs, ...), y es muy común\r encontrar varios archivos en ese formato en cualquier tipo de repositorio\r (empezando por el tradicional `README.md`).",
   "main": "index.js",
@@ -23,8 +23,6 @@
     "jest": "^23.5.0"
   },
   "dependencies": {
-    "get-md-links": "^0.1.0",
-    "link-check": "^4.4.4",
-    "markdown-link-extractor": "^1.2.0"
+    "link-check": "^4.4.4"
   }
 }
