@@ -15,7 +15,7 @@ opts.forEach((option) => {
     options.stats = true;
   }
 })
-mdLinks(ruta, options);
+mdLinks(ruta, options)
 .then(response1 => {
   response1.forEach(element => {
     console.log(`${element.file} ${element.href}  ${element.text} `);
