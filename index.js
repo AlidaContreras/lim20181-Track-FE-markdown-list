@@ -11,7 +11,6 @@ const validateMD = (direction, arrPaths_) => {
     if (path.extname(direction) === '.md') {
       if (fs.existsSync(directionResolve)) {
         arrPaths_.push(direction);
-
       }
     }
   }
@@ -23,10 +22,7 @@ const validateMD = (direction, arrPaths_) => {
     })
   }
   return arrPaths_;
-}//resuelve la ruta ingresada, pero validada si es MD
-//y entra a la siguiente funcion como doc para que lea el texto del contenido
-//resuelve el texto del documento.md en string y entra como text a la siguiente 
-//funcion para que extraiga los links
+}
 const linksExtractor = (arrPathsMd) => new Promise((resolve, reject) => {
   const obj = [];
   arrPathsMd.map((pathMD) => {
@@ -45,7 +41,6 @@ const linksExtractor = (arrPathsMd) => new Promise((resolve, reject) => {
       })
     })
   })
-
   resolve(obj)
 })
 //resuelve un array con todos los links que se encontro en el text
@@ -53,11 +48,8 @@ const validateStatusHttp = (obj) => new Promise((resolve, reject) => {
   const checks = obj.map(link => {
     return linkCheckPromise(link)
   })
-  Promise.all(checks).then(res => {
-    resolve(res)
-  })
+  Promise.all(checks).then(res =>resolve(res))
 })
-
 const linkCheckPromise = (link) => {
   return new Promise((resolve, reject) => {
     linkCheck(link.href, (err, result) => {
@@ -95,12 +87,11 @@ const validateStats = (arrStatsAndvalidate) => {
   return new Promise((result, reject) => {
     const arrBroken = [];
     arrStatsAndvalidate[1].map((objt) => {
-      if(objt.status === 0){
+      if (objt.status === 0) {
         arrBroken.push(objt.href)
       }
     })
     arrStatsAndvalidate[0].broken = arrBroken.length;
-
     result(arrStatsAndvalidate[0])
   })
 }
@@ -109,46 +100,31 @@ const mdLinks = (ruta, options) => {
   const arrayOfFile = validateMD(ruta)
   return new Promise((resolve, reject) => {
     if (!options.validate && !options.stats) {//solo pone la ruta
-      resolve(linksExtractor(arrayOfFile)
-        .then(response1 => {
-          response1.forEach(element => {
-            console.log(`${element.file} ${element.href}  ${element.text} `);
-          });
-        })
-        .catch(console.error))
+      linksExtractor(arrayOfFile)
+        .then(response1 => resolve(response1))
+        .catch(console.error)
     }
     else if (options.validate && !options.stats) {
-      resolve(linksExtractor(arrayOfFile)
+      linksExtractor(arrayOfFile)
         .then((obj) => validateStatusHttp(obj))
-        .then(response => {
-          console.log(response);
-        })
+        .then(response => resolve(response))
         .catch(console.error)
-      )
     }
     else if (!options.validate && options.stats) {
-      resolve(linksExtractor(arrayOfFile)
-      .then((obj) => validateStatusHttp(obj))
-      .then((arrayOfFil) => stats(arrayOfFil))
-      .then(response => {
-        console.log(response[0]);
-      })
-      .catch(console.error)
-      )
+      linksExtractor(arrayOfFile)
+        .then((obj) => validateStatusHttp(obj))
+        .then((arrayOfFil) => stats(arrayOfFil))
+        .then(response => resolve(response[0]))
+        .catch(console.error)
     }
     else if (options.validate && options.stats) {
-      resolve(linksExtractor(arrayOfFile)
-      .then((obj) => validateStatusHttp(obj))
-      .then((arrayOfFil) => stats(arrayOfFil))
-      .then((arrStatsAndvalidate) => validateStats(arrStatsAndvalidate))
-      .then(response => {
-        console.log(response);
-      })
-      .catch(console.error)
-      )
+      linksExtractor(arrayOfFile)
+        .then((obj) => validateStatusHttp(obj))
+        .then((arrayOfFil) => stats(arrayOfFil))
+        .then((arrStatsAndvalidate) => validateStats(arrStatsAndvalidate))
+        .then(response => resolve(response))
+        .catch(console.error)
     }
   })
 }
-module.exports = {
-  mdLinks
-}
+module.exports = mdLinks;

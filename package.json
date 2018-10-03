@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/AlidaContreras/lim20181-Track-FE-markdown-list#readme",
   "devDependencies": {
-    "jest": "^23.5.0"
+    "jest": "^23.6.0"
   },
   "dependencies": {
     "link-check": "^4.4.4"
