@@ -4,7 +4,7 @@ Esta es una libreria que permite visualizar el estados de los links de un archiv
 ## Versión
 1.0.0
 ## Homepage
-https://github.com/AlidaContreras/lim20181-Track-FE-markdown-list
+[GitHub Alida Contreras](https://github.com/AlidaContreras/lim20181-Track-FE-markdown-list)
 
 ## Instalación
  ```
@@ -53,8 +53,3 @@ Total: 3
 Unique: 3
 Broken: 1
 ```
-
-
-
-
-

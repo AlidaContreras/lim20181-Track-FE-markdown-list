@@ -1,65 +1,56 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const markdownLinkExtractor = require('markdown-link-extractor');
 const linkCheck = require('link-check');
-const getLinks = require('get-md-links');
-const obj = [];
 
-const validateMD = (direction) => new Promise((resolve, reject) => {
+const validateMD = (direction, arrPaths_) => {
+  arrPaths_ = arrPaths_ || [];
   const directionResolve = path.resolve(direction);
-
   const directory = fs.statSync(directionResolve);
   if (directory.isFile()) {
     if (path.extname(direction) === '.md') {
       if (fs.existsSync(directionResolve)) {
-        resolve(directionResolve);
-      }
-      else {
-        reject('El archivo no existe')
+        arrPaths_.push(direction);
+
       }
     }
   }
   else if (directory.isDirectory()) {
-    const files = fs.readdirSync(direction);
-    const arrPromesas = files.map((file) => {
-      const abc = path.join(directionResolve, file);
-      return validateMD(abc);
+    const filesInDir = fs.readdirSync(direction);
+    filesInDir.map((file) => {
+      const fileResolve = path.join(directionResolve, file);
+      validateMD(fileResolve, arrPaths_);
     })
-    resolve(arrPromesas)
   }
-})//resuelve la ruta ingresada, pero validada si es MD
+  return arrPaths_;
+}//resuelve la ruta ingresada, pero validada si es MD
 //y entra a la siguiente funcion como doc para que lea el texto del contenido
-const readContent = (doc) => new Promise((resolve, reject) => {
-  fs.readFile(doc, 'utf8', (err, data) => {
-    if (err) {
-      reject(err);
-    } else {
-      resolve(data);
-    }
-  })
-})//resuelve el texto del documento.md en string y entra como text a la siguiente 
+//resuelve el texto del documento.md en string y entra como text a la siguiente 
 //funcion para que extraiga los links
-const linksExtractor = (text, pathname) => new Promise((resolve, reject) => {
-  const arrayLinks = markdownLinkExtractor(text);//esto me devuelve un array de links
-  if (arrayLinks.length > 0) {
-    for (let i = 0; i < arrayLinks.length; i++) {
-      let texto = getLinks(text)[i]
+const linksExtractor = (arrPathsMd) => new Promise((resolve, reject) => {
+  const obj = [];
+  arrPathsMd.map((pathMD) => {
+    const expRegLinks = /\[((.+?))\]\((http|https|ftp|ftps).+?\)/g;
+    const expRegURLHref = /\((http|https|ftp|ftps).+?\)/g;
+    const expRegLinktext = /\[.+?\]/g;
+    const textarrPathsMd = fs.readFileSync(pathMD).toString();
+    const links = textarrPathsMd.match(expRegLinks);
+    links.map(link => {
+      const textHref = link.match(expRegURLHref).toString();
+      const textText = link.match(expRegLinktext).toString();
       obj.push({
-        file: path.resolve(pathname),
-        href: texto.href,
-        text: texto.text,
+        file: path.resolve(pathMD),
+        href: textHref.substring(1, textHref.length - 1),
+        text: textText.substring(1, textText.length - 1),
       })
-    }
-    resolve([obj, arrayLinks])
-  }
-  else {
-    reject("El archivo no tiene Links")
-  }
+    })
+  })
+
+  resolve(obj)
 })
 //resuelve un array con todos los links que se encontro en el text
 const validateStatusHttp = (obj) => new Promise((resolve, reject) => {
-  const checks = obj[0].map(link => {
+  const checks = obj.map(link => {
     return linkCheckPromise(link)
   })
   Promise.all(checks).then(res => {
@@ -88,91 +79,73 @@ const linkCheckPromise = (link) => {
     })
   })
 }
-const stats = (arrayLinks) => {
-  return new Promise((resolve, reject) => {
-    const obj1 = {
-      total: arrayLinks.length,
-      unique: [...new Set(arrayLinks)].length,
-    }
-    resolve(obj1)
+const stats = (arrayOfFil) => {
+  return new Promise((result, reject) => {
+    const stats1 = {};
+    const arrStats = [];
+    arrayOfFil.map((obj) => {
+      arrStats.push(obj.href);
+    });
+    stats1.total = arrStats.length,
+    stats1.unique = [...new Set(arrStats)].length
+    result([stats1, arrayOfFil])
   })
 }
-const validateStats = (arrWithStatus) => {
+const validateStats = (arrStatsAndvalidate) => {
   return new Promise((result, reject) => {
     const arrBroken = [];
-    const arrUniques = [];
-    arrWithStatus.forEach(element => {
-      arrUniques.push(element.href)
-      if (element.value === 'Fail') {
-        arrBroken.push(element.href)
+    arrStatsAndvalidate[1].map((objt) => {
+      if(objt.status === 0){
+        arrBroken.push(objt.href)
       }
-    });
-    const obj2 = {
-      total: arrWithStatus.length,
-      unique: [...new Set(arrUniques)].length,
-      broken: arrBroken.length
-    }
-    result(obj2);
+    })
+    arrStatsAndvalidate[0].broken = arrBroken.length;
+
+    result(arrStatsAndvalidate[0])
   })
 }
-// const dir = (w)
-
 const mdLinks = (ruta, options) => {
   const path = fs.statSync(ruta);
+  const arrayOfFile = validateMD(ruta)
   return new Promise((resolve, reject) => {
-    if (path.isDirectory()) {
-      validateMD(ruta)
-        .then(res => Promise.all(res))
-        .then(paths => {
-          return paths.map(path => {
-            readContent(path)
-              .then((text) => linksExtractor(text, ruta))
-              .then(response1 => {
-                console.log(response1[0]);
-              })
-              .catch(console.error)
-          })
+    if (!options.validate && !options.stats) {//solo pone la ruta
+      resolve(linksExtractor(arrayOfFile)
+        .then(response1 => {
+          response1.forEach(element => {
+            console.log(`${element.file} ${element.href}  ${element.text} `);
+          });
         })
-    }
-    else if (!options.validate && !options.stats) {//solo pone la ruta
-      validateMD(ruta)
-        .then((res) => readContent(res))
-        .then((text) => linksExtractor(text, ruta))
-        .then(response => {
-          console.log(response[0]);
-        })
-        .catch(console.error)
+        .catch(console.error))
     }
     else if (options.validate && !options.stats) {
-      validateMD(ruta)
-        .then((res) => readContent(res))
-        .then((text) => linksExtractor(text, ruta))
-        .then(validateStatusHttp)
+      resolve(linksExtractor(arrayOfFile)
+        .then((obj) => validateStatusHttp(obj))
         .then(response => {
           console.log(response);
         })
         .catch(console.error)
+      )
     }
     else if (!options.validate && options.stats) {
-      validateMD(ruta)
-        .then((res) => readContent(res))
-        .then((text) => linksExtractor(text, ruta))
-        .then(stats)
-        .then(response => {
-          console.log(response);
-        })
-        .catch(console.error)
+      resolve(linksExtractor(arrayOfFile)
+      .then((obj) => validateStatusHttp(obj))
+      .then((arrayOfFil) => stats(arrayOfFil))
+      .then(response => {
+        console.log(response[0]);
+      })
+      .catch(console.error)
+      )
     }
     else if (options.validate && options.stats) {
-      validateMD(ruta)
-        .then((res) => readContent(res))
-        .then((text) => linksExtractor(text, ruta))
-        .then(validateStatusHttp)
-        .then(validateStats)
-        .then(response => {
-          console.log(response)
-        })
-        .catch(console.error)
+      resolve(linksExtractor(arrayOfFile)
+      .then((obj) => validateStatusHttp(obj))
+      .then((arrayOfFil) => stats(arrayOfFil))
+      .then((arrStatsAndvalidate) => validateStats(arrStatsAndvalidate))
+      .then(response => {
+        console.log(response);
+      })
+      .catch(console.error)
+      )
     }
   })
 }
